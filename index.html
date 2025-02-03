@@ -9,12 +9,14 @@
 <body>
     <div class="heart-rate">
         <label for="bpm" id="BpmLabel"></label>
-        <img src="assets/heart.png" id="HeartImg">
+        <div class="heart-img-div">
+            <img src="assets/heart.png" id="HeartImg">
+        </div>
     </div>
 </body>
 <script>
-    const bpm_label = document.getElementById("BpmLabel")
-    const heart_img = document.getElementById("HeartImg")
+    let bpm_label = document.getElementById("BpmLabel")
+    let heart_img = document.getElementById("HeartImg")
     const DEFAULT_WIDTH = 128
 
     const min_size = 1.0
@@ -42,7 +44,7 @@
     }
 
     function beat_heart() {
-        heart_img.style.width = DEFAULT_WIDTH * max_size;
+        heart_img.style.animationDuration = 60 / current_bpm + "s";
     }
 
 </script>

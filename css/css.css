@@ -1,4 +1,25 @@
+@keyframes beat {
+    0% {width: 90px;}
+    50% {width: 100px;}
+    100% {width: 90px;}
+}
+
+.heart-img-div {
+    width: 100px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+
+    img {
+        animation-name: beat;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        width: 90px;
+    }
+}
+
 .heart-rate {
+    font-family: Arial;
     width: 300px;
     height: 100px;
 
@@ -10,9 +31,5 @@
     
     label {
         margin-left: auto;
-    }
-
-    img {
-        width: 90px;
     }
 }
