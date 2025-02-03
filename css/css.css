@@ -1,0 +1,18 @@
+.heart-rate {
+    width: 300px;
+    height: 100px;
+
+    color: #fff;
+    font-size: 72px;
+
+    display: flex;
+    align-items: center;
+    
+    label {
+        margin-left: auto;
+    }
+
+    img {
+        width: 90px;
+    }
+}

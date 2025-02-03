@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Rate Monitor</title>
+    <link rel="stylesheet" href="css/css.css">
+</head>
+<body>
+    <div class="heart-rate">
+        <label for="bpm" id="BpmLabel"></label>
+        <img src="assets/heart.png" id="HeartImg">
+    </div>
+</body>
+<script>
+    const bpm_label = document.getElementById("BpmLabel")
+    const heart_img = document.getElementById("HeartImg")
+    const DEFAULT_WIDTH = 128
+
+    const min_size = 1.0
+    const max_size = 1.2
+
+    let current_bpm = 0.0
+
+    var ws = new WebSocket("ws://localhost:8765/");
+
+    ws.onopen = function(){
+        console.log("Connection is Established");
+    };
+
+    ws.onmessage = function(evt) {
+        var received_msg = evt.data;
+        current_bpm = Number(received_msg);
+        beat_heart();
+        update_bpm();
+
+        console.log(current_bpm);
+    };
+
+    function update_bpm() {
+        bpm_label.innerText = current_bpm.toString();
+    }
+
+    function beat_heart() {
+        heart_img.style.width = DEFAULT_WIDTH * max_size;
+    }
+
+</script>
+</html>

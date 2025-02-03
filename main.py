@@ -1,5 +1,7 @@
+import asyncio
+from websockets.asyncio.server import broadcast, serve
+
 import configparser
-import cv2
 
 from utils.hr_monitor import HRMonitor
 
@@ -9,20 +11,32 @@ cfg = configparser.ConfigParser()
 cfg.read(CONFIG_PATH)
 
 heart_rate_monitor = HRMonitor(cfg)
-
-fps = 15
-loop_delta = 1./fps
-
 frequency = int(cfg.get("CalculationParameters", "bpmCalculationFrequency"))
 
-i = 0
-while True:
-    heart_rate_monitor.update()
-    i = i + 1
+CONNECTIONS = set()
 
-    if i >= frequency:
-        print(heart_rate_monitor.current_bpm)
-        i = 0
+async def register(websocket):
+    CONNECTIONS.add(websocket)
+    try:
+        await websocket.wait_closed()
+    finally:
+        CONNECTIONS.remove(websocket)
 
-heart_rate_monitor.cam.release()
-cv2.destroyAllWindows()
+async def update_bpm():
+    i = 0
+    while True:
+        heart_rate_monitor.update()
+        i = i + 1
+
+        if i >= frequency:
+            message = str(heart_rate_monitor.current_bpm)
+            broadcast(CONNECTIONS, message)
+            i = 0
+
+            await asyncio.sleep(0.1)
+
+async def main():
+    async with serve(register, "localhost", int(cfg.get("Server", "ServerPort"))): 
+        await update_bpm()
+
+asyncio.run(main())
