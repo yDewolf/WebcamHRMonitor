@@ -1,5 +1,5 @@
 import cv2
-import configparser
+from configparser import ConfigParser
 import numpy
 
 class MagniParams:
@@ -19,16 +19,16 @@ class MagniParams:
 
         self.bufferSize = bufferSize
     
-    def __init__(self, cfg: configparser.ConfigParser):
+    def __init__(self, cfg: ConfigParser):
         section = "ColorMagnification"
 
-        self.levels = int(cfg.get(section, "levels"))
-        self.alpha = int(cfg.get(section, "alpha"))
+        self.levels = cfg.getint(section, "levels")
+        self.alpha = cfg.getint(section, "alpha")
         
-        self.minFrequency = float(cfg.get(section, "minFrequency"))
-        self.maxFrequency = float(cfg.get(section, "maxFrequency"))
+        self.minFrequency = cfg.getfloat(section, "minFrequency")
+        self.maxFrequency = cfg.getfloat(section, "maxFrequency")
 
-        self.bufferSize = int(cfg.get(section, "bufferSize"))
+        self.bufferSize = cfg.getint(section, "bufferSize")
         self.bufferIndex = 0
 
 class HeartRate:
@@ -45,13 +45,13 @@ class HeartRate:
         self.bpmBufferSize = bpmBufferSize
         self.bpmBuffer = numpy.zeros((self.bpmBufferSize))
 
-    def __init__(self, cfg: configparser.ConfigParser):
+    def __init__(self, cfg: ConfigParser):
         section = "CalculationParameters"
 
-        self.bpmCalculationFrequency = int(cfg.get(section, "bpmCalculationFrequency"))
+        self.bpmCalculationFrequency = cfg.getint(section, "bpmCalculationFrequency")
         self.bpmBufferIndex = 0
 
-        self.bpmBufferSize = int(cfg.get(section, "bpmBufferSize"))
+        self.bpmBufferSize = cfg.getint(section, "bpmBufferSize")
         self.bpmBuffer = numpy.zeros((self.bpmBufferSize))
 
 class CalculationParams:
@@ -66,11 +66,15 @@ class CalculationParams:
     def __init__(self, video_size, magni_params, cfg):
         self.calculate(video_size, magni_params, cfg)
 
-    def calculate(self, video_size: tuple, magni_params: MagniParams, cfg: configparser.ConfigParser):
-        videoChannels = int(cfg.get("Capture", "videoChannels"))
-        videoFrameRate = int(cfg.get("Capture", "videoFrameRate"))
+    def calculate(self, video_size: tuple, magni_params: MagniParams, cfg: ConfigParser):
+        videoChannels = cfg.getint("Capture", "videoChannels")
+        videoFrameRate = cfg.getint("Capture", "videoFrameRate")
 
-        firstFrame = numpy.zeros((video_size[1], video_size[0], videoChannels))
+        firstFrame = numpy.zeros((
+            int(video_size[1]),
+            int(video_size[0]),
+            videoChannels
+        ))
         firstGauss = buildGauss(firstFrame, magni_params.levels + 1)[magni_params.levels]
         videoGauss = numpy.zeros((magni_params.bufferSize, firstGauss.shape[0], firstGauss.shape[1], videoChannels))
         fourierTransformAvg = numpy.zeros((magni_params.bufferSize))
@@ -109,7 +113,7 @@ def reconstructFrame(pyramid, index, levels):
     return filteredFrame
 
 
-def calculateBpm(frame: numpy.array, real_size: tuple, video_size: tuple, calc_params: CalculationParams, magni_params: MagniParams, heart_rate: HeartRate):
+def calculateBpm(frame: numpy.array, real_size: tuple, video_size: tuple, scale: float, calc_params: CalculationParams, magni_params: MagniParams, heart_rate: HeartRate):
     detectionFrame = frame[
         video_size[1] // 2:real_size[1] - video_size[1] // 2,
         video_size[0] // 2:real_size[0] - video_size[0] // 2, :
@@ -124,6 +128,7 @@ def calculateBpm(frame: numpy.array, real_size: tuple, video_size: tuple, calc_p
     if magni_params.bufferIndex % heart_rate.bpmCalculationFrequency == 0:
         for buf in range(magni_params.bufferSize):
             calc_params.fourierTransformAvg[buf] = numpy.real(fourierTransform[buf]).mean()
+        
         hz = calc_params.frequencies[numpy.argmax(calc_params.fourierTransformAvg)]
         bpm = 60.0 * hz
 

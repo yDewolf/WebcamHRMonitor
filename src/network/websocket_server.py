@@ -17,9 +17,9 @@ class SimpleWSServer:
 
     def __init__(self, cfg: ConfigParser):
         self.CONNECTIONS = set()
-        self.PORT = int(cfg.get("Server", "WSServerPort"))
-        self.update_freq = int(cfg.get("CalculationParameters", "bpmCalculationFrequency"))
-        self.show_bpm_updates = bool(cfg.get("Console", "BpmUpdates"))
+        self.PORT = cfg.getint("Server", "WSServerPort")
+        self.update_freq = cfg.getint("CalculationParameters", "bpmCalculationFrequency")
+        self.show_bpm_updates = cfg.getboolean("Console", "BpmUpdates")
 
         self.hr_monitor = HRMonitor(cfg)
 
@@ -66,6 +66,6 @@ class SimpleWSServer:
             await asyncio.sleep(0.1)
 
     async def main(self):
-        print(f"Server started at port: {self.PORT}")
+        print(f"Websocket server started at port: {self.PORT}")
         async with serve(self.register, "localhost", int(self.PORT)):
             await self.update_bpm()

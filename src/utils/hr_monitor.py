@@ -8,6 +8,7 @@ class HRMonitor:
     cam: cv2.VideoCapture
     real_size: tuple
     video_size: tuple
+    scale: float
 
     magni_params: MagniParams
     calculation_params: CalculationParams
@@ -16,18 +17,20 @@ class HRMonitor:
     current_bpm: int
 
     def __init__(self, cfg: ConfigParser):
-        cameraIndex = int(cfg.get("Capture", "CameraIndex"))
+        cameraIndex = cfg.getint("Capture", "CameraIndex")
         cam = get_cam_by_index(cameraIndex)
+        scale = cfg.getfloat("Capture", "ScaleCameraBy")
 
-        real_size = (int(cam.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        real_size = (int(cam.get(cv2.CAP_PROP_FRAME_WIDTH) * scale), int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT) * scale))
 
         set_cam_size(cam, real_size[0], real_size[1])
 
-        video_size = (real_size[0] // 2, real_size[1] // 2)
+        video_size = (int(real_size[0] * scale * 2), int(real_size[1] * scale * 2))
 
         self.cam = cam
         self.real_size = real_size
         self.video_size = video_size
+        self.scale = scale
 
         self.magni_params = MagniParams(cfg)
         self.calculation_params = CalculationParams(video_size, self.magni_params, cfg)
@@ -36,5 +39,7 @@ class HRMonitor:
     
     def update(self):
         ret, frame = self.cam.read()
+        if ret == False:
+            return
 
-        self.current_bpm = calculateBpm(frame, self.real_size, self.video_size, self.calculation_params, self.magni_params, self.heart_rate)
+        self.current_bpm = calculateBpm(frame, self.real_size, self.video_size, self.scale, self.calculation_params, self.magni_params, self.heart_rate)

@@ -27,9 +27,11 @@ class SimpleHttpServer:
     httpd: HTTPServer
 
     def __init__(self, cfg: ConfigParser):
-        self.PORT = int(cfg.get("Server", "HttpPort"))
+        self.PORT = cfg.getint("Server", "HttpPort")
 
         self.httpd = HTTPServer(cfg.get("Server", "WebPagePath"), ("", self.PORT))
 
     def start_server(self):
+        print(f"\Http server started at port: {self.PORT}")
+
         self.httpd.serve_forever()

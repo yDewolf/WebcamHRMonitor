@@ -2,8 +2,6 @@ import cv2
 
 def get_cam_by_index(i):
     cam = cv2.VideoCapture(i)
-    # cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    # cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     if not cam.isOpened():
         print("Cannot open camera")
