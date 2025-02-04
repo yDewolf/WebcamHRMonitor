@@ -30,14 +30,26 @@
         console.log("Connection is Established");
     };
 
-    ws.onmessage = function(evt) {
-        var received_msg = evt.data;
-        current_bpm = Number(received_msg);
-        beat_heart();
-        update_bpm();
+    ws.addEventListener("message", ({ data }) => {
+        const event = JSON.parse(data);
+        console.log(event)
+        switch (event.type) {
+            case "bpm_update":
+                current_bpm = Number(event.value)
+                beat_heart()
+                update_bpm()
+                console.log(current_bpm)
+                break;
+        }
+    });
+    // ws.onmessage = function(evt) {
+    //     var received_msg = evt.data;
+    //     current_bpm = Number(received_msg);
+    //     beat_heart();
+    //     update_bpm();
 
-        console.log(current_bpm);
-    };
+    //     console.log(current_bpm);
+    // };
 
     function update_bpm() {
         bpm_label.innerText = current_bpm.toString();

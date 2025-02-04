@@ -32,6 +32,7 @@ class HRMonitor:
         self.magni_params = MagniParams(cfg)
         self.calculation_params = CalculationParams(video_size, self.magni_params, cfg)
         self.heart_rate = HeartRate(cfg)
+        self.current_bpm = -1
     
     def update(self):
         ret, frame = self.cam.read()
