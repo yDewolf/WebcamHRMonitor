@@ -29,6 +29,14 @@ class SimpleWSServer:
     async def register(self, websocket):
         self.CONNECTIONS.add(websocket)
         print(f"Connected to {websocket}")
+
+        # Send the current bpm for new connections
+        event = {
+            "type": "bpm_update",
+            "value": self.hr_monitor.current_bpm
+        }
+        await websocket.send(json.dumps(event))
+
         try:
             await websocket.wait_closed()
         finally:
