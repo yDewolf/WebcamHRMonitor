@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @keyframes beat {
     0% {width: 90px;}
     50% {width: 100px;}
@@ -18,6 +19,10 @@
     100% { transform: translate(1px, -2px) rotate(-1deg); }
   }
 
+body {
+    background-color: black;
+}
+
 .heart-img-div {
     width: 100px;
     height: 120px;
@@ -36,7 +41,8 @@
 }
 
 .heart-rate {
-    font-family: Arial;
+    font-family: "Roboto";
+    font-weight: bold;
     width: 300px;
     height: 100px;
     

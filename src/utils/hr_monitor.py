@@ -17,6 +17,9 @@ class HRMonitor:
     current_bpm: int
 
     def __init__(self, cfg: ConfigParser):
+        self.load_config(cfg)
+    
+    def load_config(self, cfg: ConfigParser):
         cameraIndex = cfg.getint("Capture", "CameraIndex")
         cam = get_cam_by_index(cameraIndex)
         scale = cfg.getfloat("Capture", "ScaleCameraBy")

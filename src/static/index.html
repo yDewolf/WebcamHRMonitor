@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heart Rate Monitor</title>
     <link rel="stylesheet" href="css/css.css">
+    
 </head>
 <body>
     <div class="heart-rate">
@@ -13,67 +14,7 @@
             <img src="assets/heart.svg" id="HeartImg">
         </div>
     </div>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
 </body>
-<script>
-    let bpm_label = document.getElementById("BpmLabel")
-    let heart_img = document.getElementById("HeartImg")
-    let current_bpm = 0.0
-
-    const MIN_BPM = 72.0
-    const MAX_BPM = 140.0
-    const SHAKE_THRESHOLD = 100.0
-
-    var ws = new WebSocket("ws://localhost:8765/");
-
-    ws.onopen = function(){
-        console.log("Connection is Established");
-    };
-
-    ws.addEventListener("message", ({ data }) => {
-        const event = JSON.parse(data);
-        console.log(event)
-        switch (event.type) {
-            case "bpm_update":
-                current_bpm = Number(event.value)
-                update_bpm()
-                // console.log(current_bpm)
-                break;
-        }
-    });
-
-    function update_bpm() {
-        bpm_label.innerText = current_bpm.toString();
-        bpm_label.style.color = lerp_color('#FFFFFF', '#FF3030', Math.max(get_percent(MIN_BPM, MAX_BPM, current_bpm), 0.0))
-        if (current_bpm > SHAKE_THRESHOLD) {
-            bpm_label.style.animationName = "shake"
-        } else {
-            bpm_label.style.animationName = ""
-        }
-
-        heart_img.style.animationDuration = 60 / current_bpm + "s";
-    }
-
-    function get_percent(min, max, number) {
-        return ((number - min) / (max - min));
-    }
-
-    function lerp_color(color1, color2, percent) {
-        // Convert the hex colors to RGB values
-        const r1 = parseInt(color1.substring(1, 3), 16);
-        const g1 = parseInt(color1.substring(3, 5), 16);
-        const b1 = parseInt(color1.substring(5, 7), 16);
-
-        const r2 = parseInt(color2.substring(1, 3), 16);
-        const g2 = parseInt(color2.substring(3, 5), 16);
-        const b2 = parseInt(color2.substring(5, 7), 16);
-
-        // Interpolate the RGB values
-        const r = Math.round(r1 + (r2 - r1) * percent);
-        const g = Math.round(g1 + (g2 - g1) * percent);
-        const b = Math.round(b1 + (b2 - b1) * percent);
-
-        // Convert the interpolated RGB values back to a hex color
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-</script>
 </html>

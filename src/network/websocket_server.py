@@ -6,6 +6,8 @@ from utils.hr_monitor import HRMonitor
 from configparser import ConfigParser
 
 # Idk how to make websocket servers, sorry if this is awful
+# Also I think it doesn't need a websocket server and I should just use the http one
+# to host the overlay and update it, but ofc idk how to do this in http
 
 class SimpleWSServer:
     hr_monitor: HRMonitor
@@ -18,10 +20,13 @@ class SimpleWSServer:
     def __init__(self, cfg: ConfigParser):
         self.CONNECTIONS = set()
         self.PORT = cfg.getint("Server", "WSServerPort")
-        self.update_freq = cfg.getint("CalculationParameters", "bpmCalculationFrequency")
-        self.show_bpm_updates = cfg.getboolean("Console", "BpmUpdates")
+        self.load_config(cfg)
 
         self.hr_monitor = HRMonitor(cfg)
+    
+    def load_config(self, cfg: ConfigParser):
+        self.update_freq = cfg.getint("CalculationParameters", "bpmCalculationFrequency")
+        self.show_bpm_updates = cfg.getboolean("Console", "BpmUpdates")
 
     def start_server(self):
         asyncio.run(self.main())
@@ -59,7 +64,7 @@ class SimpleWSServer:
                 
                 for websocket in self.CONNECTIONS:
                     await websocket.send(json.dumps(event))
-                    print(f"Sent message to: {websocket} | Message: {str(event)}")
+                    # print(f"Sent message to: {websocket} | Message: {str(event)}")
 
                 continue
             

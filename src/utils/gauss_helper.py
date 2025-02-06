@@ -20,6 +20,9 @@ class MagniParams:
         self.bufferSize = bufferSize
     
     def __init__(self, cfg: ConfigParser):
+        self.load_config(cfg)
+    
+    def load_config(self, cfg: ConfigParser):
         section = "ColorMagnification"
 
         self.levels = cfg.getint(section, "levels")
@@ -46,6 +49,9 @@ class HeartRate:
         self.bpmBuffer = numpy.zeros((self.bpmBufferSize))
 
     def __init__(self, cfg: ConfigParser):
+        self.load_config(cfg)
+    
+    def load_config(self, cfg: ConfigParser):
         section = "CalculationParameters"
 
         self.bpmCalculationFrequency = cfg.getint(section, "bpmCalculationFrequency")
