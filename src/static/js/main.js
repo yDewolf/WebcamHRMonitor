@@ -1,5 +1,7 @@
 // import { get_percent, lerp_color } from "utils.js";
 
+const bpmRequest = new Request("/get_current_hr")
+
 let bpm_label = document.getElementById("BpmLabel")
 let heart_img = document.getElementById("HeartImg")
 let current_bpm = 0.0
@@ -9,25 +11,6 @@ const MIN_BPM = 72.0
 const MAX_BPM = 140.0
 // Threshold to activate the shake animation
 const SHAKE_THRESHOLD = 100.0
-
-// Connect to the websocket server and handle bpm updates
-var ws = new WebSocket("ws://localhost:8765/");
-
-ws.onopen = function(){
-    console.log("Connection is Established");
-};
-
-ws.addEventListener("message", ({ data }) => {
-    const event = JSON.parse(data);
-    console.log(event)
-    switch (event.type) {
-        case "bpm_update":
-            current_bpm = Math.floor(Number(event.value))
-            update_bpm()
-            // console.log(current_bpm)
-            break;
-    }
-});
 
 function update_bpm() {
     bpm_label.innerText = current_bpm.toString();
@@ -40,3 +23,12 @@ function update_bpm() {
 
     heart_img.style.animationDuration = 60 / current_bpm + "s";
 }
+setInterval(function(){
+    fetch(bpmRequest)
+        .then((response) => response.json())
+        .then((data) => {
+            current_bpm = data.bpm
+        });
+
+    update_bpm()
+}, 1000);
