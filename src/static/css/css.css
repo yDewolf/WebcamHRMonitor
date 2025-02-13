@@ -19,9 +19,9 @@
     100% { transform: translate(1px, -2px) rotate(-1deg); }
   }
 
-body {
+/* body {
     background-color: black;
-}
+} */
 
 .heart-img-div {
     width: 100px;
